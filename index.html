@@ -1,0 +1,63 @@
+<html>
+    <head>
+        <title>Download ARTE videos</title>
+    </head>
+    <body>
+
+        <div id="app">
+            <input v-model="videoLink" placeholder="URL of the video" />
+            <select v-model="videoQuality">
+                <option disabled value="">Quality</option>
+                <option>HQ</option>
+                <option>SQ</option>
+            </select>
+            <select v-model="versionCode">
+                <option disabled value="">Version</option>
+                <option>VOF</option>
+                <option>VA-STA</option>
+                <option>VFAUD</option>
+            </select>
+            <button v-on:click="download">Download</button>
+
+            <a v-bind:href="linkHref" v-if="showLink">
+                {{ linkTitle }}
+            </a>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script>
+            const jsonBaseURL = 'https://api.arte.tv/api/player/v1/config/fr/';
+
+            new Vue({
+                el: '#app',
+                data () {
+                    return {
+                        videoLink: '',
+                        videoQuality: '',
+                        versionCode: '',
+
+                        showLink: false,
+                        linkHref: '',
+                        linkTitle: ''
+                    }
+                },
+                methods: {
+                    download () {
+                        console.log(this.videoLink)
+                        const [,videoID] = this.videoLink.match(/arte\.tv\/fr\/videos\/([a-zA-Z0-9-]+)/)
+                        axios.get(`${jsonBaseURL}/${videoID}`).then(response => {
+                            const data = response.data.videoJsonPlayer;
+                            const title = data.VTI
+                            const flux = Object.keys(data.VSR)
+                            const video = data.VSR[flux.find((f) => data.VSR[f].versionCode === this.versionCode)];
+                            this.linkHref = video.url;
+                            this.linkTitle = `Download ${title}`;
+                            this.showLink = true;
+                        })
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>
