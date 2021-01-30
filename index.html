@@ -44,7 +44,6 @@
                 },
                 methods: {
                     download () {
-                        console.log(this.videoLink)
                         const [,videoID] = this.videoLink.match(/arte\.tv\/fr\/videos\/([a-zA-Z0-9-]+)/)
                         axios.get(`${jsonBaseURL}/${videoID}`).then(response => {
                             const data = response.data.videoJsonPlayer;
